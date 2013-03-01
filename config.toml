@@ -1,0 +1,12 @@
+# sample config
+[local]
+server = "squid.local"
+port = 3128
+username = "appplemac"
+password = "themostsecretpasswordever"
+
+[ext]
+server = "proxy.ext.un.org"
+port = 8080
+username = "appplemac"
+password = "onemoresecretpass"

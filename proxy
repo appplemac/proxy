@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+require 'toml'
+
+services = `networksetup -listnetworkserviceorder`.scan(/\(\d*\).*$/).map {|service| service.gsub(/\(\d*\)\s/, '')}.map {|service| service.gsub(/\s/, "\\ ")}
+
+begin
+  proxies = TOML.load_file("config.toml")
+rescue
+  abort "Failed to load config file"
+end
+
+if ARGV[0].nil?
+  abort "Usage: proxy [on|off|NAME]"
+end
+if ARGV[0] == "on"
+  services.each {|service| `networksetup -setwebproxystate #{service} on`}
+elsif ARGV[0] == "off"
+  services.each {|service| `networksetup -setwebproxystate #{service} off`}
+else
+  current = proxies[ARGV[0]]
+  if current.nil?
+    abort "No such proxy configured"
+  end
+  if not current["username"].nil?
+    auth = "on"
+  else
+    auth = "off"
+  end
+  services.each do |service|
+    command = "networksetup -setwebproxy #{service} #{current["server"]} #{current["port"]} #{auth} #{current["username"]} #{current["password"]}"
+    `#{command}`
+  end
+end
