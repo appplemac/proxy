@@ -11,25 +11,17 @@ rescue
   abort "Failed to load config file"
 end
 
-if ARGV[0].nil?
-  abort "Usage: proxy [on|off|NAME]"
-end
-if ARGV[0] == "on"
-  services.each {|service| `networksetup -setwebproxystate #{service} on`}
-elsif ARGV[0] == "off"
-  services.each {|service| `networksetup -setwebproxystate #{service} off`}
+abort "Usage: proxy [on|off|NAME]" if ARGV[0].nil?
+
+way = ARGV[0]
+if %w{ on off }.include?(way)
+  services.each {|service| `networksetup -setwebproxystate #{service} #{way}`}
 else
-  current = proxies[ARGV[0]]
-  if current.nil?
-    abort "No such proxy configured"
-  end
-  if not current["username"].nil?
-    auth = "on"
-  else
-    auth = "off"
-  end
+  current = proxies[way]
+  abort "No such proxy configured" if current.nil?
+  auth = current["username"].nil? ? "off" : "on"
+  params = %w{ server port auth username password }.map { |attr| current[attr] }.join ' '
   services.each do |service|
-    command = "networksetup -setwebproxy #{service} #{current["server"]} #{current["port"]} #{auth} #{current["username"]} #{current["password"]}"
-    `#{command}`
+    `networksetup -setwebproxy #{service} #{params}`
   end
 end
