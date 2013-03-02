@@ -1,7 +1,9 @@
 #!/usr/bin/env ruby
 require 'toml'
 
-services = `networksetup -listnetworkserviceorder`.scan(/\(\d*\).*$/).map {|service| service.gsub(/\(\d*\)\s/, '')}.map {|service| service.gsub(/\s/, "\\ ")}
+services = `networksetup -listnetworkserviceorder`.scan(/\(\d*\).*$/).map do |service|
+  service.gsub(/\(\d*\)\s/, '').gsub(/\s/, "\\ ")
+end
 
 begin
   proxies = TOML.load_file(File.dirname(__FILE__) + "/config.toml")
