@@ -4,7 +4,7 @@ require 'toml'
 services = `networksetup -listnetworkserviceorder`.scan(/\(\d*\).*$/).map {|service| service.gsub(/\(\d*\)\s/, '')}.map {|service| service.gsub(/\s/, "\\ ")}
 
 begin
-  proxies = TOML.load_file("config.toml")
+  proxies = TOML.load_file(File.dirname(__FILE__) + "/config.toml")
 rescue
   abort "Failed to load config file"
 end
