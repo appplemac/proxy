@@ -19,7 +19,7 @@ if %w{ on off }.include?(way)
 else
   current = proxies[way]
   abort "No such proxy configured" if current.nil?
-  auth = current["username"].nil? ? "off" : "on"
+  current["auth"] = current["username"].nil? ? "off" : "on"
   params = %w{ server port auth username password }.map { |attr| current[attr] }.join ' '
   services.each do |service|
     `networksetup -setwebproxy #{service} #{params}`
